@@ -1,19 +1,6 @@
 import java.util.*;
 import java.util.stream.*;
 
-class GoodsBogie {
-    String type;
-    String cargo;
-
-    GoodsBogie(String type, String cargo) {
-        this.type = type;
-        this.cargo = cargo;
-    }
-}
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-
 class Bogie {
     String name;
     int capacity;
@@ -22,42 +9,40 @@ class Bogie {
         this.name = name;
         this.capacity = capacity;
     }
-
-    public String toString() {
-        return name + " (" + capacity + ")";
-    }
 }
-import java.util.regex.*;
 
 public class TrainConsistManagementApp {
     public static void main(String[] args) {
         System.out.println("=== Train Consist Management App ===");
 
-        List<GoodsBogie> bogies = new ArrayList<>();
         List<Bogie> bogies = new ArrayList<>();
 
-        bogies.add(new Bogie("Sleeper", 72));
-        bogies.add(new Bogie("AC Chair", 56));
-        bogies.add(new Bogie("First Class", 40));
-
-        bogies.sort(Comparator.comparingInt(b -> b.capacity));
-
-        for (Bogie b : bogies) {
-            System.out.println(b);
+        for (int i = 0; i < 100000; i++) {
+            bogies.add(new Bogie("Sleeper", 72));
+            bogies.add(new Bogie("AC Chair", 56));
+            bogies.add(new Bogie("First Class", 40));
         }
-        String trainId = "TRN-1234";
-        String cargoCode = "PET-AB";
 
-        Pattern trainPattern = Pattern.compile("TRN-\\d{4}");
-        Pattern cargoPattern = Pattern.compile("PET-[A-Z]{2}");
+        long startLoop = System.nanoTime();
 
-        bogies.add(new GoodsBogie("Cylindrical", "Petroleum"));
-        bogies.add(new GoodsBogie("Rectangular", "Coal"));
-        bogies.add(new GoodsBogie("Cylindrical", "Petroleum"));
+        List<Bogie> loopResult = new ArrayList<>();
+        for (Bogie b : bogies) {
+            if (b.capacity > 60) {
+                loopResult.add(b);
+            }
+        }
 
-        boolean isSafe = bogies.stream()
-                .allMatch(b -> !b.type.equals("Cylindrical") || b.cargo.equals("Petroleum"));
+        long endLoop = System.nanoTime();
 
-        System.out.println("Safety Compliance: " + isSafe);
+        long startStream = System.nanoTime();
+
+        List<Bogie> streamResult = bogies.stream()
+                .filter(b -> b.capacity > 60)
+                .collect(Collectors.toList());
+
+        long endStream = System.nanoTime();
+
+        System.out.println("Loop Time: " + (endLoop - startLoop));
+        System.out.println("Stream Time: " + (endStream - startStream));
     }
 }
